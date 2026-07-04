@@ -1,0 +1,4 @@
+NAME                      STATUS   ROLES           AGE   VERSION
+k3d-devops-lab-agent-0    Ready    <none>          14h   v1.35.5+k3s1
+k3d-devops-lab-agent-1    Ready    <none>          14h   v1.35.5+k3s1
+k3d-devops-lab-server-0   Ready    control-plane   14h   v1.35.5+k3s1
