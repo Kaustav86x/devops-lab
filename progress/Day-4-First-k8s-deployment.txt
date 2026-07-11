@@ -1,0 +1,26 @@
+xrig@DESKTOP-0AA3J7N:~/devops-lab/app/sample-next-app$ kubectl apply -f k8s/
+deployment.apps/k8s-deployment-1 unchanged
+service/k8s-deployment-1 unchanged
+
+#using port forward we can map the port to localhost 3000
+
+kubectl port-forward svc/k8s-deployment-1 3000:80
+Forwarding from 127.0.0.1:3000 -> 3000
+Forwarding from [::1]:3000 -> 3000
+
+xrig@DESKTOP-0AA3J7N:~/devops-lab/app/sample-next-app$ kubectl apply -f k8s/
+deployment.apps/k8s-deployment-1 unchanged
+service/k8s-deployment-1 created
+
+xrig@DESKTOP-0AA3J7N:~/devops-lab/app/sample-next-app$ kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+k8s-deployment-1   1/1     1            1           111m
+
+xrig@DESKTOP-0AA3J7N:~/devops-lab/app/sample-next-app$ kubectl get services
+NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+k8s-deployment-1   NodePort    10.43.116.255   <none>        80:30080/TCP   59s
+kubernetes         ClusterIP   10.43.0.1       <none>        443/TCP        2d23h
+
+xrig@DESKTOP-0AA3J7N:~/devops-lab/app/sample-next-app$ kubectl get pods -w
+NAME                               READY   STATUS    RESTARTS       AGE
+k8s-deployment-1-f476b9577-mn9jb   1/1     Running   8 (100m ago)   112m

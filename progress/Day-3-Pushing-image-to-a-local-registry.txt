@@ -1,0 +1,22 @@
+#pushing the image to a local directory
+
+docker push localhost:5000/my-sample-next-app:v1
+The push refers to repository [localhost:5000/my-sample-next-app]
+c320a0853314: Pushed
+6a0ac1617861: Pushed
+031f5a5f9e61: Pushed
+0cdfe5602dc4: Pushed
+b2cbbfe903b0: Pushed
+04c12f173198: Pushed
+fff4e2c1b189: Pushed
+f2d8003c39c4: Pushed
+4feea04c1543: Pushed
+v1: digest: sha256:af5007c734520315313b9df0197942f7cc9fb905cbf6ceea4fe8f5e6e5258fe6 size: 856
+
+
+#listing the image via terminal
+ curl http://localhost:5000/v2/_catalog
+{repositories:[my-sample-next-app]}
+
+curl http://localhost:5000/v2/my-sample-next-app/tags/list
+{"name":"my-sample-next-app","tags":["v1"]}

@@ -1,0 +1,8 @@
+#containerize an application and mapping it to port 3000.
+
+IMAGE                   ID             DISK USAGE   CONTENT SIZE   EXTRA
+my-sample-next-app:v1   af5007c73452        243MB         59.6MB   U    
+▲ Next.js 16.2.10
+- Local:         http://26445abb6261:3000
+- Network:       http://26445abb6261:3000
+✓ Ready in 0ms
