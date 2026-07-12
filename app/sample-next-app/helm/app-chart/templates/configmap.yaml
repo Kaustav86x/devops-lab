@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-next-app-configmap
+  labels:
+    app: sample-next-app
+data:
+  PORT: "3000"
+  HOSTNAME: "0.0.0.0"
+  NODE_ENV: "production"

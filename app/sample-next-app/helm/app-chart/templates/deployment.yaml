@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deploymentName }}
+  labels:
+    app: {{ .Values.app }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:                       # selector is the glue that tells the deployment which pods belong to it. 
+    matchLabels:
+      app: {{ .Values.app }}       # must match template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app }}      # pods get this details 
+    spec:
+      containers:
+      - name: {{ .Values.app }}                # name of the container
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}    # my build image
+        imagePullPolicy: {{ .Values.image.pullPolicy }}  # always pull the image from the registry
+        ports:
+        - containerPort: {{ .Values.appListeningPort }}              # port on which my app listens to
+
+        #--------adding resources--------
+        resources:
+          requests:
+            memory: {{ .Values.resources.requests.memory }}
+            cpu: {{ .Values.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.resources.limits.memory }}
+            cpu: {{ .Values.resources.limits.cpu }}
+
+        #--------liveness -------
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.healthCheckEndPoint }}
+            port: {{ .Values.appListeningPort }}
+          initialDelaySeconds: 15     # giving some time to initialize the pod.
+          periodSeconds: 20           # check in every 20s seconds
+          failureThreshold: 3        # after 3 consequtive failures, the pod is restarted.
+
+        #--------readiness -------
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.healthCheckEndPoint }}
+            port: {{ .Values.appListeningPort }}
+          initialDelaySeconds: 5     # it's faster to check for liveness that readiness.
+          periodSeconds: 10          # check in every 10 seconds
+          failureThreshold: 3        # after 3 consequtive failures, the pod is marked as not ready.
+
+        env:                         # using the refeerences from the configmap.yaml and secret.yaml file
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.configMapRef }}
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.configMapRef }}
+              key: PORT
+        - name: HOSTNAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.configMapRef }}
+              key: HOSTNAME
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:          
+              name: {{ .Values.secretRef }}
+              key: DB_HOST
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef }}
+              key: DB_PASSWORD
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretRef }}
+              key: DB_PORT

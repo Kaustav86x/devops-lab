@@ -1,0 +1,47 @@
+# the image used for the deployment
+image:
+  repository: host.k3d.internal:5000/my-sample-next-app
+  tag: v1
+  pullPolicy: Always
+
+# number of replicas for the deployment
+replicaCount: 3
+
+# resources for the deployment
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 250m
+    memory: 128Mi
+
+#name of the app
+app: sample-next-app
+
+#endpoint to check liveness and readiness of the pod
+healthCheckEndPoint: /api/health
+
+#the port on which the app is listening to
+appListeningPort: 3000
+
+#configmap refrences
+configMapRef: sample-next-app-configmap
+
+#secret refrences
+secretRef: sample-next-app-secret
+
+#delpoyment name
+deploymentName: k8s-deployment-1
+
+#service name
+serviceName: k8s-deployment-1
+
+#service port
+servicePort: 80
+
+#service Node port
+serviceNodePort: 30080
+
+#service protocol
+serviceProtocol: TCP

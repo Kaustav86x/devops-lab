@@ -1,0 +1,13 @@
+apiVersion: v1          # service don't belong to the app group, they are core kubernetes objects, so they belong to the core group.
+kind: Service
+metadata: 
+  name: {{ .Values.serviceName }}
+spec:
+  selector:                   # selector is the glue that connects service to pods.
+    app: {{ .Values.app }}    # must match pod labels from deployment.yaml
+  ports:
+    - protocol: {{ .Values.serviceProtocol }}         # service protocol
+      port: {{ .Values.servicePort }}                 # service port
+      targetPort: {{ .Values.appListeningPort }}      # next.js container port
+      nodePort: {{ .Values.serviceNodePort }}               # port that I open in my browser to access the app. (30080 is a random port, you can choose any port between 30000-32767)
+  type: NodePort
