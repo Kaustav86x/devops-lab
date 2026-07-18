@@ -1,0 +1,27 @@
+# installing helm chart
+xrig@DESKTOP-0AA3J7N:~/devops-lab/app/sample-next-app/helm/app-chart$ helm install app-chart .
+NAME: app-chart
+LAST DEPLOYED: Sun Jul 12 18:40:07 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+
+# changing the replica count to 3 in values.yaml and upgrading the chart
+
+xrig@DESKTOP-0AA3J7N:~/devops-lab/app/sample-next-app/helm/app-chart$ helm upgrade app-chart .
+Release "app-chart" has been upgraded. Happy Helming!
+NAME: app-chart
+LAST DEPLOYED: Sun Jul 12 20:12:07 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 4
+TEST SUITE: None
+
+# now testing the pods that are online
+
+xrig@DESKTOP-0AA3J7N:~/devops-lab/app/sample-next-app/helm/app-chart$ kubectl get pods
+NAME                                READY   STATUS    RESTARTS   AGE
+k8s-deployment-1-5dd9758df5-n77g4   1/1     Running   0          92m
+k8s-deployment-1-5dd9758df5-vdgvq   1/1     Running   0          26s
+k8s-deployment-1-5dd9758df5-xqlxf   1/1     Running   0          26s
