@@ -1,4 +1,4 @@
-# terraform block
+# terraform block ( required providers declaration needs to exists in evrey module that uses that provider )
 terraform {
     required_providers {
         docker = {
@@ -8,28 +8,24 @@ terraform {
     }
 }
 
-# provider block
-provider "docker" {
-    host = "unix:///var/run/docker.sock"
-}
-
+# The provider blocks is being removed
 # resource blocks
 
 # resource block A - Image
 # pulling the image
 resource "docker_image" "registry" {
-    name = "registry:2"
+    name = var.registry_image
 }
 
 # resource block B - Container
 # creating the container
 resource "docker_container" "registry_container" {
     image = docker_image.registry.image_id
-    name = "registry_container"
+    name = var.registry_container
 
     ports {
-        internal = "5000"
-        external = "5000"
+        internal = var.port
+        external = var.port
     }
 }
 
