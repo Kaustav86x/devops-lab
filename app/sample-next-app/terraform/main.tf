@@ -13,23 +13,14 @@ provider "docker" {
     host = "unix:///var/run/docker.sock"
 }
 
-# resource blocks
+# resource blocks stored in another main.tf file will be called from here
 
-# resource block A - Image
-# pulling the image
-resource "docker_image" "registry" {
-    name = "registry:2"
+# module block for the variables related to registry
+
+# module block for registry
+module "local_registry" {
+    source = "./modules/registry"
+    registry_container = "registry_container"
+    registry_image = "registry:2"              # passing the value of the image
+    port = 5000
 }
-
-# resource block B - Container
-# creating the container
-resource "docker_container" "registry_container" {
-    image = docker_image.registry.image_id
-    name = "registry_container"
-
-    ports {
-        internal = "5000"
-        external = "5000"
-    }
-}
-
