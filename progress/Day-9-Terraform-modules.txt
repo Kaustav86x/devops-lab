@@ -1,0 +1,80 @@
+# using terraform show, the registry and image variables cleared 
+
+xrig@DESKTOP-0AA3J7N:~/devops-lab/app/sample-next-app/terraform$ terraform show
+# module.local_registry.docker_container.registry_container:
+resource "docker_container" "registry_container" {
+    attach                                      = false
+    bridge                                      = null
+    command                                     = [
+        "/etc/docker/registry/config.yml",
+    ]
+    container_read_refresh_timeout_milliseconds = 15000
+    cpu_set                                     = null
+    cpu_shares                                  = 0
+    domainname                                  = null
+    entrypoint                                  = [
+        "/entrypoint.sh",
+    ]
+    env                                         = []
+    hostname                                    = "13e839c2237b"
+    id                                          = "13e839c2237bc5c289d1d991aa597a44e01bba95219c276cb09cd4552fb10317"
+    image                                       = "sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373"
+    init                                        = false
+    ipc_mode                                    = "private"
+    log_driver                                  = "json-file"
+    logs                                        = false
+    max_retry_count                             = 0
+    memory                                      = 0
+    memory_reservation                          = 0
+    memory_swap                                 = 0
+    must_run                                    = true
+    name                                        = "registry_container"
+    network_data                                = [
+        {
+            gateway                   = "172.18.0.1"
+            global_ipv6_address       = null
+            global_ipv6_prefix_length = 0
+            ip_address                = "172.18.0.2"
+            ip_prefix_length          = 16
+            ipv6_gateway              = null
+            mac_address               = "5a:5c:fa:58:c2:2f"
+            network_name              = "bridge"
+        },
+    ]
+    network_mode                                = "bridge"
+    platform                                    = "linux"
+    privileged                                  = false
+    publish_all_ports                           = false
+    read_only                                   = false
+    remove_volumes                              = true
+    restart                                     = "no"
+    rm                                          = false
+    runtime                                     = "runc"
+    security_opts                               = []
+    shm_size                                    = 64
+    start                                       = true
+    stdin_open                                  = false
+    stop_signal                                 = null
+    stop_timeout                                = 0
+    tty                                         = false
+    user                                        = null
+    userns_mode                                 = null
+    wait                                        = false
+    wait_timeout                                = 60
+    working_dir                                 = "/"
+
+    ports {
+        external = 5000
+        internal = 5000
+        ip       = "0.0.0.0"
+        protocol = "tcp"
+    }
+}
+
+# module.local_registry.docker_image.registry:
+resource "docker_image" "registry" {
+    id          = "sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373registry:2"
+    image_id    = "sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373"
+    name        = "registry:2"
+    repo_digest = "registry@sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373"
+}
