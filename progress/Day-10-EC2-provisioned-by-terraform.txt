@@ -1,0 +1,108 @@
+Day 10 — INFRA-203: Terraform Against Real Cloud (AWS) — Debrief
+The Task
+
+Provision a real AWS EC2 instance using Terraform — including a security group and SSH key pair — and verify by SSHing into the running instance from WSL. Note down what production-grade Terraform would additionally require.
+
+How It Connected to Day 9
+
+Day 9 established the module pattern — Terraform config as a reusable, parameterized library. Day 10 took the same foundational Terraform knowledge and pointed it at a real cloud provider instead of a local Docker daemon.
+
+The shape of the work was identical:
+
+Provider block — just AWS instead of Docker
+Resource blocks with cross-references — just EC2 resources instead of containers
+Same init → plan → apply → destroy workflow
+
+The only genuinely new layer was cloud authentication — Terraform needing IAM credentials to talk to AWS — and cloud-specific concepts like security groups, AMI IDs, and key pairs. The Terraform thinking itself was already in place from Days 8 and 9.
+
+What I Got Right
+
+Security group structure — I correctly wrote separate ingress blocks for SSH and HTTP, and an egress block with protocol = "-1" for all outbound traffic. The structure was clean and well-commented on the first attempt after switching from the wrong resource type.
+
+Dependency chain — I correctly referenced the security group and key pair from the EC2 instance, letting Terraform build the dependency graph automatically. No manual ordering needed.
+
+key_name correction — after initially self-referencing inside the key pair resource, I immediately understood the mistake — key_name is just a plain string label, not a cross-resource reference.
+
+Region specificity — I independently verified the AMI ID for ap-south-1 rather than assuming a generic one would work. That's the right instinct — AMI IDs are region-scoped.
+
+Instance type reasoning — I correctly pushed back on t2.micro being free tier for ap-south-1. t3.micro is the correct free tier instance type for that region. Reading region-specific documentation rather than accepting a generic answer is exactly the right approach.
+
+AWS CLI setup in WSL — when Cloud Shell wasn't available, I independently set up the AWS CLI locally, configured credentials, and verified with aws sts get-caller-identity. No hand-holding needed.
+
+The Challenges I Faced
+
+Challenge 1 — Wrong Security Group Resource
+
+I started with aws_security_group_rule instead of aws_security_group. The former adds rules to an existing group. The latter creates one from scratch — which is what the task required.
+
+Root cause: The Terraform AWS provider has multiple security group related resources with similar names. Reading resource names carefully and understanding what each one does before using it matters.
+
+Recovery: Switched to aws_security_group and restructured the ingress/egress blocks correctly inside it.
+
+Lesson: Resource names in Terraform are precise. aws_security_group and aws_security_group_rule are fundamentally different things despite sounding similar. Always read the resource description before writing.
+
+Challenge 2 — Self-Referencing Key Pair
+
+Inside the aws_key_pair resource I wrote:
+
+key_name = aws_key_pair.deployer_key.key_name
+
+This referenced a resource that didn't exist — and was trying to reference itself circularly.
+
+Root cause: Overthinking the key_name argument. Coming from the EC2 instance where key_name references the key pair resource, I assumed the same pattern applied inside the key pair itself.
+
+Recovery: Understood that key_name inside aws_key_pair is simply the string label AWS registers the key under — no different from naming a container or a security group.
+
+Lesson: Not every argument that shares a name follows the same pattern. key_name means different things in different resource contexts — in aws_key_pair it's a label, in aws_instance it's a reference.
+
+Challenge 3 — AWS Account Verification Blocking Cloud Shell
+
+Account verification took over a week with no resolution, blocking Cloud Shell access entirely.
+
+Recovery: Correctly identified that Cloud Shell is just a browser-based terminal — nothing more. Set up AWS CLI in WSL, configured IAM credentials, and used WSL as a complete replacement. Zero functionality lost.
+
+Lesson: Cloud Shell is a convenience, not a requirement. Any terminal with AWS CLI configured and valid IAM credentials does the same job. Don't let a single blocked surface stop the work.
+
+Challenge 4 — .terraform/ Committed to Git
+
+Pushed the repo to GitHub and hit a rejection — the AWS provider binary inside .terraform/ was 844MB, exceeding GitHub's 100MB file size limit.
+
+Root cause: .gitignore was not in place before the first commit. .terraform/ got tracked and committed along with the rest of the project files.
+
+Recovery: Removed the file from Git tracking with git rm --cached, added a proper .gitignore, and rewrote Git history to remove the large binary from past commits before force pushing.
+
+Lesson: .terraform/ is to Terraform what node_modules/ is to Node — auto-generated, heavy, never committed. .gitignore must exist before the first git add on any Terraform project. The standard entries to always include:
+
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+What I Learned
+
+Cloud authentication flow — Terraform doesn't have its own credential store. It reads from the same credentials file the AWS CLI uses, set up via aws configure. This means verifying CLI access with aws sts get-caller-identity is the fastest way to confirm Terraform will also be able to authenticate.
+
+Security groups are stateful firewalls — ingress and egress are separate concerns. Ingress rules define what traffic is allowed in — I must explicitly permit it. Egress is typically open (protocol = "-1") because outbound responses need to flow freely.
+
+AMI IDs are region-scoped — the same operating system image has a completely different AMI ID in every AWS region. There is no universal AMI ID. Always look up the correct one for Ir target region before applying.
+
+terraform destroy discipline — free tier has limits. A running EC2 instance silently burns through the 750 free hours/month allocation. Destroying after verification is not optional — it's a habit that prevents surprise billing.
+
+Git history is permanent until I rewrite it — git rm --cached removes a file from future tracking but doesn't erase it from past commits. GitHub still sees it in history and rejects the push. Rewriting history with git filter-branch or creating a fresh orphan branch is the correct recovery path.
+
+What production Terraform additionally requires:
+
+Remote state backend (S3) — local tfstate is a single point of failure. If the machine is lost, state is gone and Terraform loses track of everything it manages. In production, state lives in S3 — shared across the team, versioned, and recoverable.
+
+State locking (DynamoDB) — without locking, two engineers running terraform apply simultaneously corrupt the state file. A DynamoDB table acts as a distributed mutex — only one apply runs at a time, everyone else waits.
+
+Commands Reference
+bash
+aws configure                    # set up IAM credentials locally
+aws sts get-caller-identity      # verify Terraform can reach AWS
+terraform init                   # download AWS provider
+terraform plan                   # preview cloud resources before creation
+terraform apply                  # provision real infrastructure
+terraform show                   # read current state in human-readable form
+terraform destroy                # tear everything down
+ssh -i ~/.ssh/day10_key ec2-user@<public-ip>   # verify SSH access
+git rm -r --cached .terraform/   # remove provider binaries from Git tracking
