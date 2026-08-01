@@ -1,0 +1,22 @@
+# three tasks
+# 1. installing docker
+# 2. creates a user
+# 3. copies a config file
+
+- hosts: webservers
+  become: true
+  tasks:
+    - name: Installing Docker
+      ansible.builtin.dnf:
+        name: docker
+        state: present      # create this thing if doesn't exists, do nothing if present
+
+    - name: Creats a user
+      ansible.builtin.user:
+        name: KaustavDev
+        state: present
+
+    - name: Copy a config file
+      ansible.builtin.copy:
+        src: files/app.config                   # location of the file on wsl
+        dest: /home/ec2-user/files_from_wsl     # destination on ec2
