@@ -59,6 +59,10 @@ resource "aws_instance" "example" {
     tags = {
         Name = "Day-10-ec2-provisioned-by-terraform"
     }
+
+    provisioner "local-exec" {
+        command = "printf '%s\n%s ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/day10_key' '[webservers]'  '${self.public_ip}'> ../../ansible/inventory.ini && ansible-playbook -i ../../ansible/inventory.ini ../../ansible/playbook.yaml --ssh-extra-args='-o StrictHostKeyChecking=no'"
+    }
 }
 # aws keypair
 resource "aws_key_pair" "deployer" {
