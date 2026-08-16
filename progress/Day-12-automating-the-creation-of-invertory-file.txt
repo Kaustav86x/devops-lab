@@ -1,0 +1,37 @@
+aws_key_pair.deployer: Creating...
+aws_security_group.web_sg: Creating...
+aws_key_pair.deployer: Creation complete after 0s [id=Kaustav_void_aws]
+aws_security_group.web_sg: Creation complete after 2s [id=sg-08696b2e2459c398b]
+aws_instance.example: Creating...
+aws_instance.example: Still creating... [00m10s elapsed]
+aws_instance.example: Provisioning with 'local-exec'...
+aws_instance.example (local-exec): Executing: ["/bin/sh" "-c" "printf '%s\n%s ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/day10_key' '[webservers]'  '13.203.223.209'> ../../ansible/inventory.ini && ansible-playbook -i ../../ansible/inventory.ini ../../ansible/playbook.yaml --ssh-extra-args='-o StrictHostKeyChecking=no'"]
+
+aws_instance.example (local-exec): PLAY [webservers] **************************************************************
+
+aws_instance.example (local-exec): TASK [Gathering Facts] *********************************************************
+aws_instance.example (local-exec): [WARNING]: Host '13.203.223.209' is using the discovered Python interpreter at '/usr/bin/python3.9', but future installation of another Python interpreter could cause a different interpreter to be discovered. See https://docs.ansible.com/ansible-core/2.20/reference_appendices/interpreter_discovery.html for more information.
+aws_instance.example (local-exec): ok: [13.203.223.209]
+
+aws_instance.example (local-exec): TASK [Installing Docker] *******************************************************
+aws_instance.example: Still creating... [00m20s elapsed]
+aws_instance.example: Still creating... [00m30s elapsed]
+aws_instance.example: Still creating... [00m40s elapsed]
+aws_instance.example: Still creating... [00m50s elapsed]
+aws_instance.example: Still creating... [01m00s elapsed]
+aws_instance.example: Still creating... [01m10s elapsed]
+aws_instance.example: Still creating... [01m20s elapsed]
+aws_instance.example: Still creating... [01m30s elapsed]
+aws_instance.example (local-exec): changed: [13.203.223.209]
+
+aws_instance.example (local-exec): TASK [Creats a user] ***********************************************************
+aws_instance.example (local-exec): changed: [13.203.223.209]
+
+aws_instance.example (local-exec): TASK [Copy a config file] ******************************************************
+aws_instance.example: Still creating... [01m40s elapsed]
+aws_instance.example (local-exec): changed: [13.203.223.209]
+
+aws_instance.example (local-exec): PLAY RECAP *********************************************************************
+aws_instance.example (local-exec): 13.203.223.209             : ok=4    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+aws_instance.example: Creation complete after 1m41s [id=i-07f9de6d03fe6f870]
